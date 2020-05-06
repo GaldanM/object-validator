@@ -1,0 +1,11 @@
+{
+	"collectCoverage": true,
+	"coverageDirectory": "coverage",
+	"coveragePathIgnorePatterns": ["/node_modules/"],
+
+	"preset": "ts-jest",
+
+	"testEnvironment": "node",
+	"testMatch": ["**/*.spec.ts"],
+	"testPathIgnorePatterns": ["/node_modules/"]
+}
