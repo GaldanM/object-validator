@@ -1,5 +1,5 @@
 import moment from 'moment';
-import handleParams from '../src';
+import objectValidator from '../index';
 import { ISchemaRouteParams } from '../types/ObjectValidator';
 
 jest.spyOn(console, 'warn').mockImplementation();
@@ -18,12 +18,12 @@ describe('types', () => {
 			expect.assertions(1);
 
 			const params = { str: 'tata' };
-			expect(handleParams(schema, params)).toMatchObject(params);
+			expect(objectValidator(schema, params)).toMatchObject(params);
 		});
 		it('wrong type', () => {
 			expect.assertions(1);
 
-			expect(() => handleParams(schema, { str: 2 })).toThrow(Error);
+			expect(() => objectValidator(schema, { str: 2 })).toThrow(Error);
 		});
 	});
 	describe('number', () => {
@@ -32,25 +32,25 @@ describe('types', () => {
 				expect.assertions(1);
 
 				const params = { nbr: 2 };
-				expect(handleParams(schema, params)).toMatchObject(params);
+				expect(objectValidator(schema, params)).toMatchObject(params);
 			});
 			it('number string', () => {
 				expect.assertions(1);
 
-				expect(handleParams(schema, { nbr: '2' })).toMatchObject({ nbr: 2 });
+				expect(objectValidator(schema, { nbr: '2' })).toMatchObject({ nbr: 2 });
 			});
 		});
 		describe('wrong types', () => {
 			it('non-number string', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { nbr: 'tata' })).toThrow(Error);
+				expect(() => objectValidator(schema, { nbr: 'tata' })).toThrow(Error);
 			});
 			it('non-numberable types', () => {
 				expect.assertions(2);
 
-				expect(() => handleParams(schema, { nbr: true })).toThrow(Error);
-				expect(() => handleParams(schema, { nbr: new Date() })).toThrow(Error);
+				expect(() => objectValidator(schema, { nbr: true })).toThrow(Error);
+				expect(() => objectValidator(schema, { nbr: new Date() })).toThrow(Error);
 			});
 		});
 	});
@@ -60,28 +60,28 @@ describe('types', () => {
 				expect.assertions(2);
 
 				let params = { bool: false };
-				expect(handleParams(schema, params)).toMatchObject(params);
+				expect(objectValidator(schema, params)).toMatchObject(params);
 
 				params = { bool: true };
-				expect(handleParams(schema, params)).toMatchObject(params);
+				expect(objectValidator(schema, params)).toMatchObject(params);
 			});
 			it('boolean strings', () => {
 				expect.assertions(2);
 
-				expect(handleParams(schema, { bool: 'false' })).toMatchObject({ bool: false });
-				expect(handleParams(schema, { bool: 'true' })).toMatchObject({ bool: true });
+				expect(objectValidator(schema, { bool: 'false' })).toMatchObject({ bool: false });
+				expect(objectValidator(schema, { bool: 'true' })).toMatchObject({ bool: true });
 			});
 		});
 		describe('wrong types', () => {
 			it('non-boolean string', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { bool: 'tata' })).toThrow(Error);
+				expect(() => objectValidator(schema, { bool: 'tata' })).toThrow(Error);
 			});
 			it('non-booleanable type', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { bool: 2 })).toThrow(Error);
+				expect(() => objectValidator(schema, { bool: 2 })).toThrow(Error);
 			});
 		});
 	});
@@ -91,7 +91,7 @@ describe('types', () => {
 				expect.assertions(1);
 
 				const date = 0;
-				const result = handleParams(schema, { date }).date as moment.Moment;
+				const result = objectValidator(schema, { date }).date as moment.Moment;
 
 				expect(result.toISOString()).toBe(moment(date).toISOString());
 			});
@@ -99,7 +99,7 @@ describe('types', () => {
 				expect.assertions(1);
 
 				const date = new Date(0);
-				const result = handleParams(schema, { date }).date as moment.Moment;
+				const result = objectValidator(schema, { date }).date as moment.Moment;
 
 				expect(result.toISOString()).toBe(moment(0).toISOString());
 			});
@@ -111,13 +111,13 @@ describe('types', () => {
 					ISO: moment(0).toISOString(),
 					number: '1234567890',
 				};
-				let result = handleParams(schema, { date: date.formatted }).date as moment.Moment;
+				let result = objectValidator(schema, { date: date.formatted }).date as moment.Moment;
 				expect(result.toISOString()).toBe(moment(date.formatted).toISOString());
 
-				result = handleParams(schema, { date: date.ISO }).date as moment.Moment;
+				result = objectValidator(schema, { date: date.ISO }).date as moment.Moment;
 				expect(result.toISOString()).toBe(moment(0).toISOString());
 
-				result = handleParams(schema, { date: date.number }).date as moment.Moment;
+				result = objectValidator(schema, { date: date.number }).date as moment.Moment;
 				expect(result.toISOString()).toBe(moment(Number(date.number)).toISOString());
 			});
 		});
@@ -126,18 +126,18 @@ describe('types', () => {
 			it('non-date number', () => {
 				expect.assertions(2);
 
-				expect(() => handleParams(schema, { date: 9999999999999999 })).toThrow(Error);
-				expect(() => handleParams(schema, { date: -9999999999999999 })).toThrow(Error);
+				expect(() => objectValidator(schema, { date: 9999999999999999 })).toThrow(Error);
+				expect(() => objectValidator(schema, { date: -9999999999999999 })).toThrow(Error);
 			});
 			it('non-date string', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { date: 'tata' })).toThrow(Error);
+				expect(() => objectValidator(schema, { date: 'tata' })).toThrow(Error);
 			});
 			it('non-dateable type', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { date: true })).toThrow(Error);
+				expect(() => objectValidator(schema, { date: true })).toThrow(Error);
 			});
 		});
 	});
@@ -148,7 +148,7 @@ describe('types', () => {
 
 				const params = { strs: 'hello' };
 
-				const strs = handleParams(schema, params).strs as string[];
+				const strs = objectValidator(schema, params).strs as string[];
 				expect(strs).toHaveLength(1);
 				expect(typeof strs[0]).toBe('string');
 				expect(strs[0]).toStrictEqual(params.strs);
@@ -156,7 +156,7 @@ describe('types', () => {
 			it('wrong type', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { strs: 1 })).toThrow(Error);
+				expect(() => objectValidator(schema, { strs: 1 })).toThrow(Error);
 			});
 		});
 		describe('multiple values', () => {
@@ -165,7 +165,7 @@ describe('types', () => {
 
 				const params = { strs: ['hello', 'world'] };
 
-				const result = handleParams(schema, params);
+				const result = objectValidator(schema, params);
 				const strs = result.strs as string[];
 				expect(strs).toHaveLength(params.strs.length);
 				strs.forEach(str => expect(typeof str).toBe('string'));
@@ -173,7 +173,7 @@ describe('types', () => {
 			it('wrong type', () => {
 				expect.assertions(1);
 
-				expect(() => handleParams(schema, { strs: [1, 2] })).toThrow(Error);
+				expect(() => objectValidator(schema, { strs: [1, 2] })).toThrow(Error);
 			});
 		});
 	});

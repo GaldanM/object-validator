@@ -2,7 +2,7 @@
   "name": "object-validator",
   "version": "1.0.0",
   "description": "Validate any JS object with a simple schema",
-  "main": "src/index.ts",
+  "main": "index.ts",
   "repository": "https://github.com/GaldanM/object-validator",
   "author": "Galdan MOULINNEUF",
   "license": "MIT",
