@@ -1,0 +1,73 @@
+{
+	"env": {
+		"es6": true,
+		"node": true,
+		"jest/globals": true
+	},
+	"plugins": [
+		"@typescript-eslint",
+		"jest",
+		"only-warn"
+	],
+	"extends": [
+		"eslint:all",
+		"plugin:@typescript-eslint/all",
+		"plugin:jest/all"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": "tsconfig.json",
+		"sourceType": "module"
+	},
+	"rules": {
+		"@typescript-eslint/explicit-member-accessibility": ["warn", { "accessibility": "no-public" }],
+		"@typescript-eslint/indent": ["warn", "tab"],
+		"@typescript-eslint/no-magic-numbers": "off",
+		"@typescript-eslint/no-type-alias": ["warn", {
+			"allowAliases": "in-unions-and-intersections",
+			"allowMappedTypes": "always",
+			"allowTupleTypes": "always"
+		}],
+		"@typescript-eslint/no-unsafe-assignment": "off",
+		"@typescript-eslint/no-unused-vars-experimental": ["warn", { "ignoreArgsIfArgsAfterAreUsed": true }],
+		"@typescript-eslint/no-use-before-define": "off",
+		"@typescript-eslint/prefer-readonly-parameter-types": "off",
+		"@typescript-eslint/quotes": ["warn", "single"],
+		"@typescript-eslint/restrict-template-expressions": "off",
+		"@typescript-eslint/space-before-function-paren": ["warn", {
+			"anonymous": "never",
+			"named": "never",
+			"asyncArrow": "always"
+		}],
+		"@typescript-eslint/strict-boolean-expressions": "off",
+		"@typescript-eslint/typedef": "off",
+		"array-bracket-newline": ["warn", { "multiline": false }],
+		"array-element-newline": "off",
+		"arrow-parens": ["warn", "as-needed"],
+		"capitalized-comments": "off",
+		"comma-dangle": ["warn", "always-multiline"],
+		"consistent-return": "off",
+		"function-call-argument-newline": "off",
+		"func-style": ["warn", "declaration", { "allowArrowFunctions": true } ],
+		"lines-between-class-members": "off",
+		"max-len": ["warn", 150],
+		"max-lines-per-function": "off",
+		"max-statements": "off",
+		"multiline-comment-style": ["warn", "separate-lines"],
+		"multiline-ternary": "off",
+		"no-console": "off",
+		"no-tabs": "off",
+		"no-ternary": "off",
+		"no-trailing-spaces": ["warn", { "skipBlankLines": true }],
+		"object-curly-spacing": ["warn", "always"],
+		"object-property-newline": "off",
+		"one-var":["warn", "never"],
+		"padded-blocks": ["warn", "never"],
+		"prefer-destructuring": ["warn", { "array": true, "object": false }],
+		"quote-props": ["warn", "as-needed"],
+		"require-unicode-regexp": "off",
+		"sort-keys": "off",
+		"space-in-parens": ["warn", "never"],
+		"sort-imports": "off"
+	}
+}

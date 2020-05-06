@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"inlineSources": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"lib": ["ESNext"],
+		"noImplicitAny": true,
+		"outDir": "dist",
+		"pretty": true,
+		"removeComments": true,
+		"sourceMap": true,
+		"strict": true,
+		"target": "esnext"
+	}
+}
+
