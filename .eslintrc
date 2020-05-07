@@ -7,15 +7,18 @@
 	"plugins": [
 		"@typescript-eslint",
 		"jest",
+		"node",
 		"only-warn"
 	],
 	"extends": [
 		"eslint:all",
 		"plugin:@typescript-eslint/all",
-		"plugin:jest/all"
+		"plugin:jest/all",
+		"plugin:node/recommended"
 	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
+		"ecmaVersion": 2020,
 		"project": "tsconfig.json",
 		"sourceType": "module"
 	},
@@ -41,6 +44,9 @@
 		}],
 		"@typescript-eslint/strict-boolean-expressions": "off",
 		"@typescript-eslint/typedef": "off",
+		"node/no-missing-import": ["warn", {
+			"tryExtensions": [".ts", ".d.ts"]
+		}],
 		"array-bracket-newline": ["warn", { "multiline": false }],
 		"array-element-newline": "off",
 		"arrow-parens": ["warn", "as-needed"],

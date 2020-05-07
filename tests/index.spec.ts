@@ -1,6 +1,5 @@
 import moment from 'moment';
-import objectValidator from '../index';
-import { ISchemaRouteParams } from '../types/ObjectValidator';
+import objectValidator, { ISchema } from '../index';
 
 jest.spyOn(console, 'warn').mockImplementation();
 
@@ -11,7 +10,7 @@ describe('types', () => {
 		bool: { type: 'boolean' },
 		date: { type: 'date' },
 		strs: { type: ['string'] },
-	} as ISchemaRouteParams;
+	} as ISchema;
 
 	describe('string', () => {
 		it('good type', () => {
