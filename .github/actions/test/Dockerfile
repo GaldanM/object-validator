@@ -1,4 +1,4 @@
-FROM 12.16.3-alpine3.11
+FROM 12.16.3-alpine
 
 RUN apk update && apk upgrade && apk add git openssh
 
