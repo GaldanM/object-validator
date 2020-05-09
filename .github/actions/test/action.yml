@@ -1,0 +1,11 @@
+name: "Run Jest"
+description: "Run Jest on your project"
+author: "GaldanM"
+
+runs:
+    using: "docker"
+    image: "Dockerfile"
+
+branding:
+    icon: "check-circle"
+    color: "green"
