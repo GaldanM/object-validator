@@ -3,15 +3,102 @@ import objectValidator, { ISchema } from '../index';
 
 jest.spyOn(console, 'warn').mockImplementation();
 
-describe('types', () => {
-	const schema = {
-		str: { type: 'string' },
-		nbr: { type: 'number' },
-		bool: { type: 'boolean' },
-		date: { type: 'date' },
-		strs: { type: ['string'] },
-	} as ISchema;
+const schema = {
+	str: { type: 'string' },
+	nbr: { type: 'number' },
+	bool: { type: 'boolean' },
+	date: { type: 'date' },
+	strs: { type: ['string'] },
+	obj: {
+		type: 'object',
+		properties: {
+			nbr: { type: 'number' },
+		},
+	},
+	objDeep: {
+		type: 'object',
+		properties: {
+			nested: {
+				type: 'object',
+				properties: {
+					nestedField: { type: 'number' },
+				},
+			},
+		},
+	},
+} as ISchema;
 
+describe('schemas', () => {
+	it('good schema', () => {
+		expect.assertions(1);
+
+		expect(() => objectValidator(schema, { nbr: 2 })).not.toThrow(Error);
+	});
+	describe('wrong schema', () => {
+		it('missing required properties', () => {
+			expect.assertions(1);
+
+			const wrongSchema = {
+				nbr: {},
+			};
+
+			// @ts-expect-error
+			expect(() => objectValidator(wrongSchema, { nbr: 2 })).toThrow(Error);
+		});
+		it('wrong schema options type', () => {
+			expect.assertions(1);
+
+			const wrongSchema = {
+				nbr: 'number',
+			};
+
+			// @ts-expect-error
+			expect(() => objectValidator(wrongSchema, { nbr: 2 })).toThrow(Error);
+		});
+		it('missing "properties" in object definition', () => {
+			expect.assertions(1);
+
+			const wrongSchema = {
+				obj: { type: 'object' },
+			};
+
+			// @ts-expect-error
+			expect(() => objectValidator(wrongSchema, { nbr: 2 })).toThrow(Error);
+		});
+		it('wrong "properties" type in object definition', () => {
+			expect.assertions(1);
+
+			const wrongSchema = {
+				obj: {
+					type: 'object',
+					properties: 'nbr: 2',
+				},
+			};
+
+			// @ts-expect-error
+			expect(() => objectValidator(wrongSchema, { obj: { nbr: 2 } })).toThrow(Error);
+		});
+		it('wrong "properties" type in deep object definition', () => {
+			expect.assertions(1);
+
+			const wrongSchema = {
+				obj: {
+					type: 'object',
+					properties: {
+						deepObj: {
+							type: 'object',
+							properties: 'nbr: 2',
+						},
+					},
+				},
+			};
+
+			// @ts-expect-error
+			expect(() => objectValidator(wrongSchema, { obj: { nbr: 2 } })).toThrow(Error);
+		});
+	});
+});
+describe('types', () => {
 	describe('string', () => {
 		it('good type', () => {
 			expect.assertions(1);
@@ -137,6 +224,59 @@ describe('types', () => {
 				expect.assertions(1);
 
 				expect(() => objectValidator(schema, { date: true })).toThrow(Error);
+			});
+		});
+	});
+	describe('object', () => {
+		describe('good types', () => {
+			describe('object', () => {
+				it('simple field', () => {
+					expect.assertions(1);
+
+					const params = { obj: { nbr: 2 } };
+
+					expect(objectValidator(schema, params)).toMatchObject(params);
+				});
+				it('complex field', () => {
+					expect.assertions(1);
+
+					const params = { obj: { nbr: '2' } };
+
+					expect(objectValidator(schema, params)).toMatchObject({ obj: { nbr: 2 } });
+				});
+				it('deep', () => {
+					expect.assertions(1);
+
+					const params = { objDeep: { nested: { nestedField: '2' } } };
+
+					expect(objectValidator(schema, params)).toMatchObject({ objDeep: { nested: { nestedField: 2 } } });
+				});
+			});
+			it('json-string object', () => {
+				expect.assertions(1);
+
+				const params = { obj: JSON.stringify({ nbr: 2 }) };
+
+				expect(objectValidator(schema, params)).toMatchObject({ obj: { nbr: 2 } });
+			});
+		});
+		describe('wrong types', () => {
+			it('json-string array', () => {
+				expect.assertions(1);
+
+				const params = { obj: JSON.stringify([{ nbr: 2 }]) };
+
+				expect(() => objectValidator(schema, params)).toThrow(Error);
+			});
+			it('non json-string', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schema, { obj: 'nbr: 2' })).toThrow(Error);
+			});
+			it('any other types', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schema, { obj: 2 })).toThrow(Error);
 			});
 		});
 	});

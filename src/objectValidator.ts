@@ -1,9 +1,8 @@
 import moment from 'moment';
 import {
-	ObjecPropertyTuple, HandleTypeFunctions,
-	IObjectProperties, IOutputProperties,
-	ISchemaOptions, ISchema,
-	ObjectPropertyValue, OutputPropertyValue, SchemaAllowedTypes,
+	IHandleFunctionMap, IInputProperties, IOutputProperties,
+	ISchema, ObjectPropertyValue, OutputPropertyValue,
+	SchemaAllowedTypes, SchemaOptions, SchemaOptionsObject,
 } from '../index';
 
 function handleString(pValue: ObjectPropertyValue, pName: string): string {
@@ -52,47 +51,89 @@ function handleDate(pValue: ObjectPropertyValue, pName: string): moment.Moment {
 	}
 	return date;
 }
+function handleObject(pValue: ObjectPropertyValue, pName: string, innerSchema: ISchema): object {
+	let receivedObject = pValue;
+	if (typeof receivedObject === 'string') {
+		try {
+			receivedObject = JSON.parse(receivedObject);
+		} catch (err) {
+			throw new Error(`"${pName}": expected JSON object but got non-JSON string`);
+		}
+	}
+	if (Array.isArray(receivedObject)) {
+		throw new Error(`"${pName}": expected object but got array`);
+	}
+	if (typeof receivedObject !== 'object') {
+		throw new Error(`"${pName}": expected Object but got "${typeof receivedObject}"`);
+	}
 
-function handleArray(schema: ISchemaOptions, pValue: ObjectPropertyValue | ObjectPropertyValue[], pName: string): OutputPropertyValue[] {
+	return objectValidator(innerSchema, receivedObject);
+}
+
+function handleArray(schema: SchemaOptions, pValue: ObjectPropertyValue | ObjectPropertyValue[], pName: string): OutputPropertyValue[] {
 	const pArray = Array.isArray(pValue) ? pValue : [pValue];
 	const [itemType] = schema.type as SchemaAllowedTypes[];
-	const itemSchema = { ...schema, type: itemType };
+	const itemSchema = { ...schema, type: itemType } as SchemaOptions;
 
 	return pArray.map((value, index) => handleProperty(itemSchema, value, `${pName}[${index}]`));
 }
 
-function handleProperty(schema: ISchemaOptions, pValue: ObjectPropertyValue, pName: string): OutputPropertyValue | OutputPropertyValue[] {
-	if (Array.isArray(schema.type)) {
-		return handleArray(schema, pValue, pName);
+function handleProperty(schemaOptions: SchemaOptions, pValue: ObjectPropertyValue, pName: string): OutputPropertyValue | OutputPropertyValue[] {
+	if (Array.isArray(schemaOptions.type)) {
+		return handleArray(schemaOptions, pValue, pName);
 	}
 
 	const newValue: OutputPropertyValue = pValue;
 
-	const typesToHandle: HandleTypeFunctions = {
+	const typesToHandle: IHandleFunctionMap = {
 		string: handleString,
 		number: handleNumber,
 		boolean: handleBoolean,
 		date: handleDate,
+		object: handleObject,
 	};
 
-	return typesToHandle[schema.type](newValue, pName);
+	return typesToHandle[schemaOptions.type](newValue, pName, (schemaOptions as SchemaOptionsObject).properties);
 }
 
-function objectValidator(schemaParams: ISchema, routeParams: IObjectProperties): IOutputProperties {
-	const params = Object.entries(routeParams);
+function validateSchema(schema: ISchema, propertyName = ''): void {
+	// eslint-disable-next-line guard-for-in
+	for (const currentPropertyName in schema) {
+		const currentProperty = schema[currentPropertyName];
+		const deepCurrentPropertyName = `${propertyName === '' ? '' : `${propertyName}.`}${currentPropertyName}`;
 
-	const checkedParams: ObjecPropertyTuple[] = params.map(([pName, pValue]) => {
-		const schema = schemaParams[pName];
+		if (typeof currentProperty !== 'object') {
+			throw new Error(`${deepCurrentPropertyName}: expected object but got "${typeof currentProperty}" instead`);
+		}
 
-		const newValue = handleProperty(schema, pValue, pName);
+		if (!currentProperty.hasOwnProperty('type')) {
+			throw new Error(`${deepCurrentPropertyName}: missing "type" property in schema options`);
+		}
 
-		return [pName, newValue];
-	});
-
-	return checkedParams.reduce((acc: IObjectProperties, [cName, cValue]) => {
-		acc[cName] = cValue;
+		if (currentProperty.type === 'object') {
+			if (currentProperty.hasOwnProperty('properties')) {
+				const currentOptionsObject = currentProperty as SchemaOptionsObject;
+				const nestedSchema = currentOptionsObject.properties;
+				if (typeof nestedSchema === 'object') {
+					validateSchema(nestedSchema, deepCurrentPropertyName);
+				} else {
+					throw new Error(`${deepCurrentPropertyName}: incorrect property "properties", expected SchemaOptionsObject`);
+				}
+			} else {
+				throw new Error(`${deepCurrentPropertyName}: missing "properties" property in schema options`);
+			}
+		}
+	}
+}
+function objectValidator(baseSchema: ISchema, inputObject: IInputProperties): IOutputProperties {
+	return Object.entries(inputObject).reduce((acc: IInputProperties, [pName, pValue]) => {
+		acc[pName] = handleProperty(baseSchema[pName], pValue, pName);
 		return acc;
 	}, {});
 }
 
-export default objectValidator;
+export default (baseSchema: ISchema, inputObject: IInputProperties): IOutputProperties => {
+	validateSchema(baseSchema);
+
+	return objectValidator(baseSchema, inputObject);
+};

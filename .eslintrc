@@ -23,15 +23,15 @@
 		"sourceType": "module"
 	},
 	"rules": {
-		"@typescript-eslint/explicit-member-accessibility": ["warn", { "accessibility": "no-public" }],
-		"@typescript-eslint/indent": ["warn", "tab"],
-		"@typescript-eslint/no-magic-numbers": "off",
-		"@typescript-eslint/no-type-alias": ["warn", {
-			"allowAliases": "in-unions-and-intersections",
-			"allowMappedTypes": "always",
-			"allowTupleTypes": "always"
+		"@typescript-eslint/ban-ts-comment": ["warn", {
+			"ts-expect-error": false
 		}],
+		"@typescript-eslint/explicit-member-accessibility": ["warn", { "accessibility": "no-public" }],
+		"@typescript-eslint/indent": "off",
+		"@typescript-eslint/no-magic-numbers": "off",
+		"@typescript-eslint/no-type-alias": "off",
 		"@typescript-eslint/no-unsafe-assignment": "off",
+		"@typescript-eslint/no-unsafe-return": "off",
 		"@typescript-eslint/no-unused-vars-experimental": ["warn", { "ignoreArgsIfArgsAfterAreUsed": true }],
 		"@typescript-eslint/no-use-before-define": "off",
 		"@typescript-eslint/prefer-readonly-parameter-types": "off",
@@ -53,15 +53,19 @@
 		"capitalized-comments": "off",
 		"comma-dangle": ["warn", "always-multiline"],
 		"consistent-return": "off",
+		"dot-location": ["warn", "property"],
 		"function-call-argument-newline": "off",
 		"func-style": ["warn", "declaration", { "allowArrowFunctions": true } ],
+		"id-length": "off",
 		"lines-between-class-members": "off",
 		"max-len": ["warn", 150],
+		"max-lines": "off",
 		"max-lines-per-function": "off",
 		"max-statements": "off",
 		"multiline-comment-style": ["warn", "separate-lines"],
 		"multiline-ternary": "off",
 		"no-console": "off",
+		"no-prototype-builtins": "off",
 		"no-tabs": "off",
 		"no-ternary": "off",
 		"no-trailing-spaces": ["warn", { "skipBlankLines": true }],

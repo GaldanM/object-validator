@@ -1,7 +1,9 @@
 {
 	"collectCoverage": true,
 	"coverageDirectory": "coverage",
-	"coveragePathIgnorePatterns": ["/node_modules/"],
+	"coveragePathIgnorePatterns": ["/node_modules/", "!*.d.ts", "index.ts"],
+
+	"moduleFileExtensions": ["js", "ts", "d.ts"],
 
 	"preset": "ts-jest",
 
