@@ -1,4 +1,4 @@
-FROM node:12.16.3-slim
+FROM 12.16.3-alpine3.11
 
 RUN apk update && apk upgrade && apk add git openssh
 
