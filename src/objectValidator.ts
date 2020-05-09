@@ -67,9 +67,8 @@ function handleObject(pValue: ObjectPropertyValue, pName: string, innerSchema: I
 		throw new Error(`"${pName}": expected Object but got "${typeof receivedObject}"`);
 	}
 
-	return objectValidator(innerSchema, receivedObject);
+	return objectValidator(innerSchema, receivedObject, pName);
 }
-
 function handleArray(schema: SchemaOptions, pValue: ObjectPropertyValue | ObjectPropertyValue[], pName: string): OutputPropertyValue[] {
 	const pArray = Array.isArray(pValue) ? pValue : [pValue];
 	const [itemType] = schema.type as SchemaAllowedTypes[];
@@ -125,9 +124,33 @@ function validateSchema(schema: ISchema, propertyName = ''): void {
 		}
 	}
 }
-function objectValidator(baseSchema: ISchema, inputObject: IInputProperties): IOutputProperties {
+
+function checkRequiredDefault(schema: ISchema, inputObject: IInputProperties, parentName: string): void {
+	const fieldsToCheck = Object.entries(schema)
+		.filter(([, value]) => value.hasOwnProperty('required') || value.hasOwnProperty('default'))
+		.map(([key, value]) => ({
+			name: key,
+			...value.hasOwnProperty('default') && { default: value.default },
+		}));
+
+	fieldsToCheck.forEach(fieldToCheck => {
+		const fullName = parentName === '' ? fieldToCheck.name : `${parentName}.${fieldToCheck.name}`;
+		if (!inputObject.hasOwnProperty(fieldToCheck.name)) {
+			if (fieldToCheck.hasOwnProperty('default')) {
+				inputObject[fieldToCheck.name] = fieldToCheck.default;
+			} else {
+				throw Error(`"${fullName}": is required`);
+			}
+		}
+	});
+}
+
+function objectValidator(schema: ISchema, inputObject: IInputProperties, parentName = ''): IOutputProperties {
+	checkRequiredDefault(schema, inputObject, parentName);
+
 	return Object.entries(inputObject).reduce((acc: IInputProperties, [pName, pValue]) => {
-		acc[pName] = handleProperty(baseSchema[pName], pValue, pName);
+		const fullName = parentName === '' ? pName : `${parentName}.${pName}`;
+		acc[pName] = handleProperty(schema[pName], pValue, fullName);
 		return acc;
 	}, {});
 }

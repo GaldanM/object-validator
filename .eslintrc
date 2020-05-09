@@ -30,6 +30,7 @@
 		"@typescript-eslint/indent": "off",
 		"@typescript-eslint/no-magic-numbers": "off",
 		"@typescript-eslint/no-type-alias": "off",
+		"@typescript-eslint/no-unnecessary-condition": ["warn", { "ignoreRhs": true }],
 		"@typescript-eslint/no-unsafe-assignment": "off",
 		"@typescript-eslint/no-unsafe-return": "off",
 		"@typescript-eslint/no-unused-vars-experimental": ["warn", { "ignoreArgsIfArgsAfterAreUsed": true }],

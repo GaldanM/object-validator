@@ -317,3 +317,72 @@ describe('types', () => {
 		});
 	});
 });
+describe('extra features', () => {
+	describe('required', () => {
+		const schemaRequired = { reqNbr: { type: 'number', required: true } } as ISchema;
+
+		it('required not missing', () => {
+			expect.assertions(1);
+
+			const params = { reqNbr: 2 };
+
+			expect(objectValidator(schemaRequired, params)).toMatchObject(params);
+		});
+		it('required missing', () => {
+			expect.assertions(1);
+
+			expect(() => objectValidator(schemaRequired, {})).toThrow(Error);
+		});
+		it('required nested missing', () => {
+			expect.assertions(1);
+
+			const schemaRequiredDeep = {
+				reqObj: {
+					type: 'object',
+					properties: {
+						reqNestedNbr: {
+							type: 'number',
+							required: true,
+						},
+					},
+				},
+			} as ISchema;
+
+			expect(() => objectValidator(schemaRequiredDeep, { reqObj: {} })).toThrow(Error);
+		});
+	});
+	describe('default', () => {
+		const schemaRequired = { reqNbr: { type: 'number', default: 1 } } as ISchema;
+
+		it('field not missing', () => {
+			expect.assertions(1);
+
+			const params = { reqNbr: 2 };
+
+			expect(objectValidator(schemaRequired, params)).toMatchObject(params);
+		});
+		it('field missing', () => {
+			expect.assertions(1);
+
+			expect(objectValidator(schemaRequired, {})).toMatchObject({ reqNbr: 1 });
+		});
+		it('field nested missing', () => {
+			expect.assertions(1);
+
+			const schemaRequiredDeep = {
+				reqObj: {
+					type: 'object',
+					properties: {
+						reqNestedNbr: {
+							type: 'number',
+							default: 1,
+						},
+					},
+				},
+			} as ISchema;
+
+			expect(objectValidator(schemaRequiredDeep, { reqObj: {} }))
+				.toMatchObject({ reqObj: { reqNestedNbr: 1 } });
+		});
+	});
+});
