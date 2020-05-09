@@ -15,4 +15,4 @@ jobs:
             - name: Install dependencies
               run: yarn install
             - name: Run tests
-              run: jest
+              run: npx jest
