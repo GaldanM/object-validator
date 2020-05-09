@@ -29,6 +29,6 @@
   },
   "type": "module",
   "engines": {
-    "node": ">=12"
+    "node": ">=10"
   }
 }
