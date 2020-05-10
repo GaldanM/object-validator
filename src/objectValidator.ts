@@ -105,7 +105,7 @@ function validateSchema(schema: ISchema, propertyName = ''): void {
 			throw new Error(`${deepCurrentPropertyName}: expected object but got "${typeof currentProperty}" instead`);
 		}
 
-		if (!currentProperty.hasOwnProperty('typ')) {
+		if (!currentProperty.hasOwnProperty('type')) {
 			throw new Error(`${deepCurrentPropertyName}: missing "type" property in schema options`);
 		}
 
