@@ -28,6 +28,10 @@
 		}],
 		"@typescript-eslint/explicit-member-accessibility": ["warn", { "accessibility": "no-public" }],
 		"@typescript-eslint/indent": "off",
+		"@typescript-eslint/no-base-to-string": ["warn", {
+			"ignoredTypeNames": ["boolean"]
+		}],
+		"@typescript-eslint/no-extra-parens": ["warn", "all", { "nestedBinaryExpressions": false }],
 		"@typescript-eslint/no-magic-numbers": "off",
 		"@typescript-eslint/no-type-alias": "off",
 		"@typescript-eslint/no-unnecessary-condition": ["warn", { "ignoreRhs": true }],
@@ -57,6 +61,7 @@
 		"dot-location": ["warn", "property"],
 		"function-call-argument-newline": "off",
 		"func-style": ["warn", "declaration", { "allowArrowFunctions": true } ],
+		"guard-for-in": "off",
 		"id-length": "off",
 		"lines-between-class-members": "off",
 		"max-len": ["warn", 150],
@@ -65,6 +70,7 @@
 		"max-statements": "off",
 		"multiline-comment-style": ["warn", "separate-lines"],
 		"multiline-ternary": "off",
+		"newline-per-chained-call": "off",
 		"no-console": "off",
 		"no-prototype-builtins": "off",
 		"no-tabs": "off",

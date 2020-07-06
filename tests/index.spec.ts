@@ -41,7 +41,6 @@ describe('schemas', () => {
 			const wrongSchema = {
 				nbr: {},
 			};
-
 			// @ts-expect-error
 			expect(() => objectValidator(wrongSchema, { nbr: 2 })).toThrow(Error);
 		});
@@ -51,7 +50,6 @@ describe('schemas', () => {
 			const wrongSchema = {
 				nbr: 'number',
 			};
-
 			// @ts-expect-error
 			expect(() => objectValidator(wrongSchema, { nbr: 2 })).toThrow(Error);
 		});
@@ -61,7 +59,6 @@ describe('schemas', () => {
 			const wrongSchema = {
 				obj: { type: 'object' },
 			};
-
 			// @ts-expect-error
 			expect(() => objectValidator(wrongSchema, { nbr: 2 })).toThrow(Error);
 		});
@@ -74,7 +71,6 @@ describe('schemas', () => {
 					properties: 'nbr: 2',
 				},
 			};
-
 			// @ts-expect-error
 			expect(() => objectValidator(wrongSchema, { obj: { nbr: 2 } })).toThrow(Error);
 		});
@@ -92,9 +88,29 @@ describe('schemas', () => {
 					},
 				},
 			};
-
 			// @ts-expect-error
 			expect(() => objectValidator(wrongSchema, { obj: { nbr: 2 } })).toThrow(Error);
+		});
+		it('wrong "required" type', () => {
+			expect.assertions(1);
+
+			// @ts-expect-error
+			const wrongExpectedSchema = { nbr: { type: 'number', required: 'abc' } } as ISchema;
+			expect(() => objectValidator(wrongExpectedSchema, {})).toThrow(Error);
+		});
+		it('wrong "default" type', () => {
+			expect.assertions(1);
+
+			// @ts-expect-error
+			const wrongExpectedSchema = { nbr: { type: 'number', default: 'abc' } } as ISchema;
+			expect(() => objectValidator(wrongExpectedSchema, {})).toThrow(Error);
+		});
+		it('wrong "expected" type', () => {
+			expect.assertions(1);
+
+			// @ts-expect-error
+			const wrongExpectedSchema = { nbr: { type: 'number', expected: ['abc', 'mdr'] } } as ISchema;
+			expect(() => objectValidator(wrongExpectedSchema, {})).toThrow(Error);
 		});
 	});
 });
@@ -273,6 +289,11 @@ describe('types', () => {
 
 				expect(() => objectValidator(schema, { obj: 'nbr: 2' })).toThrow(Error);
 			});
+			it('date object', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schema, { obj: new Date(0) })).toThrow(Error);
+			});
 			it('any other types', () => {
 				expect.assertions(1);
 
@@ -350,21 +371,30 @@ describe('extra features', () => {
 
 			expect(() => objectValidator(schemaRequiredDeep, { reqObj: {} })).toThrow(Error);
 		});
+
+		it('required wrong type', () => {
+			expect.assertions(1);
+
+			// @ts-expect-error
+			const schemaWrongRequired = { nbr: { type: 'number', required: 'true' } } as ISchema;
+
+			expect(() => objectValidator(schemaWrongRequired, {})).toThrow(Error);
+		});
 	});
 	describe('default', () => {
-		const schemaRequired = { reqNbr: { type: 'number', default: 1 } } as ISchema;
+		const schemaDefault = { reqNbr: { type: 'number', default: 1 } } as ISchema;
 
 		it('field not missing', () => {
 			expect.assertions(1);
 
 			const params = { reqNbr: 2 };
 
-			expect(objectValidator(schemaRequired, params)).toMatchObject(params);
+			expect(objectValidator(schemaDefault, params)).toMatchObject(params);
 		});
 		it('field missing', () => {
 			expect.assertions(1);
 
-			expect(objectValidator(schemaRequired, {})).toMatchObject({ reqNbr: 1 });
+			expect(objectValidator(schemaDefault, {})).toMatchObject({ reqNbr: 1 });
 		});
 		it('field nested missing', () => {
 			expect.assertions(1);
@@ -383,6 +413,61 @@ describe('extra features', () => {
 
 			expect(objectValidator(schemaRequiredDeep, { reqObj: {} }))
 				.toMatchObject({ reqObj: { reqNestedNbr: 1 } });
+		});
+	});
+	describe('expected', () => {
+		const todayDate = moment().toISOString();
+		const schemaExpected = {
+			expectedNbr: { type: 'number', expected: [2, 3, 4] },
+			expectedNbrs: { type: ['number'], expected: [2, 3, 4] },
+			expectedObj: {
+				type: 'object',
+				properties: { nbr: { type: 'number' } },
+				expected: [{ nbr: 2 }],
+			},
+			expectedDate: {
+				type: 'date',
+				expected: [todayDate],
+			},
+		} as ISchema;
+
+		describe('expected values', () => {
+			it('expected value', () => {
+				expect.assertions(2);
+
+				expect(() => objectValidator(schemaExpected, { expectedNbr: 2 })).not.toThrow(Error);
+				expect(() => objectValidator(schemaExpected, { expectedNbrs: [2, 3] })).not.toThrow(Error);
+			});
+			it('expected object', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schemaExpected, { expectedObj: { nbr: 2 } })).not.toThrow(Error);
+			});
+			it('expected date', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schemaExpected, { expectedDate: todayDate })).not.toThrow(Error);
+			});
+		});
+		describe('unexpected values', () => {
+			it('unexpected value', () => {
+				expect.assertions(2);
+
+				expect(() => objectValidator(schemaExpected, { expectedNbr: 1 })).toThrow(Error);
+				expect(() => objectValidator(schemaExpected, { expectedNbrs: [0, 1] })).toThrow(Error);
+			});
+			it('unexpected object', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schemaExpected, { expectedObj: { nbr: 3 } })).toThrow(Error);
+			});
+			it('unexpected date', () => {
+				expect.assertions(1);
+
+				expect(() => objectValidator(schemaExpected, {
+					expectedDate: moment().add(1, 'days').toISOString(),
+				})).toThrow(Error);
+			});
 		});
 	});
 });
